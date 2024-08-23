@@ -163,12 +163,34 @@ class AlumnoCarrera {
         return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna todos los resultados de la consulta
     }
 
+    public function fetchAlumnosInscriptosAñoCursado($año) {
+        $this->getConection(); // Asegura que la conexión esté establecida
+        $sql = "SELECT acm.id,
+        acm.idAlumno, 
+        a.dni, 
+        acm.idMateria, 
+        m.nombre,
+        acm.idTipoCursadoAlumno, 
+        acm.idUsuario,
+        acm.anioCursado,
+        acm.nota,
+        acm.estado_final 
+        FROM ".$this->table." 
+        acm JOIN materia m ON m.id = acm.idMateria JOIN alumno a ON a.id = acm.idAlumno
+        WHERE acm.anioCursado = ?";
+        $stmt = $this->conection->prepare($sql);
+        $stmt->execute([$año]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna todos los resultados de la consulta
+
+        //SELECT * FROM `alumno_rinde_materia`,alumno_cursa_materia as acm,materia,alumno WHERE materia.id = alumno_rinde_materia.idMateria AND alumno.id = alumno_rinde_materia.idAlumno AND acm.anioCursado = 2023 
+    }
+
 
 }
 
 // Ejemplo de uso
 $alumnoCarrera = new AlumnoCarrera();
-$datos = $alumnoCarrera->fetchAlumnosInscriptos();
+$datos = $alumnoCarrera->fetchAlumnosInscriptosAñoCursado(2024);
 echo "<pre>";
 var_dump($datos);
 echo "</pre>";
