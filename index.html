@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generar Libreta PDF</title>
+</head>
+<body>
+    <h1>Generar Libreta de Notas</h1>
+    <form action="fpdf/PruebaV.php" target="_blank" method="post">
+        <label for="dni">DNI del Alumno:</label>
+        <input type="text" name="dni" id="dni" required><br><br>
+
+        <label for="anio">Año de Cursado:</label>
+        <input type="text" name="anio" id="anio" required><br><br>
+
+        <input type="submit" name="generar" value="Generar PDF"> <i class="fa-solid fa-file-pdf"></i>
+    </form>
+</body>
+</html>
