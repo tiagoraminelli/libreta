@@ -165,7 +165,7 @@ class AlumnoRindeMateria {
 
 
     // Método para eliminar un registro
-    public function deleteRecord($id) {
+    public function deleteAlumnoRindeMateria($id) {
         $this->getConection(); // Asegura que la conexión esté establecida
         $sql = "DELETE FROM " . $this->table . " WHERE id = :id";
         $stmt = $this->conection->prepare($sql);
@@ -174,10 +174,4 @@ class AlumnoRindeMateria {
     }
 }
 
-// Ejemplo de uso
-$alumnoRindeMateria = new AlumnoRindeMateria();
-$registros = $alumnoRindeMateria->fetchAllRecords();
-echo "<pre>";
-var_dump($registros);
-echo "</pre>";
 ?>

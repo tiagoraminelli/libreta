@@ -1,7 +1,7 @@
 <?php
 require_once "bd.php"; // Asegúrate de que la clase Db esté correctamente implementada
 
-class CursarMateria {
+class carreraMateria {
     protected $table = "carrera_tiene_materia"; // Nombre de la tabla
     protected $conection; // Conexión a la base de datos
 
@@ -82,6 +82,34 @@ class CursarMateria {
         $sql = "SELECT * FROM " . $this->table;
         $stmt = $this->conection->prepare($sql);
         $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna todos los resultados de la consulta
+    }
+
+    public function fetchDatosCompletosCarrera($id){
+        $this->getConection(); // Asegura que la conexión esté establecida
+        $sql = "SELECT 
+  ctm.*, 
+  car.descripcion AS nombre_carrera, 
+  mat.nombre AS nombre_materia,
+  car.codigo as codigo,
+  mat.anio as año,
+  fmt.descripcion as descrip,
+  cur.descripcion as tipo
+FROM 
+  carrera_tiene_materia AS ctm
+JOIN 
+  carrera AS car ON ctm.idCarrera = car.id
+JOIN 
+  materia AS mat ON ctm.idMateria = mat.id
+JOIN 
+ formato AS fmt ON fmt.id = mat.idFormato
+ JOIN 
+ cursado AS cur ON mat.idCursado = cur.id
+WHERE 
+  car.id = ?;
+ ";
+        $stmt = $this->conection->prepare($sql);
+        $stmt->execute([$id]); //[$id]
         return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna todos los resultados de la consulta
     }
 

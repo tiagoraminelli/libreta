@@ -183,6 +183,29 @@ class AlumnoCarrera {
         return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna todos los resultados de la consulta
 
     }
+
+    public function fetchAlumnosInscriptosAñoDni($año, $dni) {
+        $this->getConection(); // Asegura que la conexión esté establecida
+        $sql = "SELECT acm.id,
+        acm.idAlumno, 
+        a.dni, 
+        acm.idMateria, 
+        m.nombre,
+        acm.idTipoCursadoAlumno, 
+        acm.idUsuario,
+        acm.anioCursado,
+        acm.nota,
+        acm.estado_final 
+        FROM alumno_cursa_materia
+        acm JOIN materia m ON m.id = acm.idMateria JOIN alumno a ON a.id = acm.idAlumno
+        WHERE acm.anioCursado = ? AND a.dni = ?"; // Cambié 'alumno.dni' a 'a.dni'
+        $stmt = $this->conection->prepare($sql);
+        $stmt->execute([$año, $dni]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna todos los resultados de la consulta
+    }
+    
+    
+
     public function resultadosRinde($anioCursado,$dni) {
         $this->getConection(); // Asegura que la conexión esté establecida
         $sql = "SELECT DISTINCT 
@@ -211,7 +234,7 @@ class AlumnoCarrera {
 
 // Ejemplo de uso
 $alumnoCarrera = new AlumnoCarrera();
-$datos = $alumnoCarrera->resultadosRinde(2024,46577675);
+$datos = $alumnoCarrera->fetchAlumnosInscriptosAñoDni(2022,43766375);
 echo "<pre>";
 var_dump($datos);
 echo "</pre>";
