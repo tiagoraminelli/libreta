@@ -3,7 +3,11 @@ require('fpdf.php');
 require('../modelo/bd.php'); // Ajusta la ruta a donde está realmente tu archivo 'bd.php'
 require('../modelo/alumno-materia.php'); // Ajusta la ruta a donde está realmente tu archivo 'alumno-materia.php');
 require('../modelo/alumno.php'); // 
+if(isset($_POST)){
+    $dni = $_POST['dni'];
+    $año = $_POST['año'];
 
+}
 // Clase extendida para personalizar el PDF
 class PDF extends FPDF
 {
@@ -95,7 +99,7 @@ $header = array('Nombre', 'Año Cursado', 'Nota', 'Estado Final');
 
 // Instancia del modelo para obtener datos
 $alumnoCarrera = new AlumnoCarrera();
-$data = $alumnoCarrera->fetchAlumnosInscriptosAñoDni(2022, 43766375);
+$data = $alumnoCarrera->fetchAlumnosInscriptosAñoDni($año, $dni);
 
 // Crear instancia del PDF y generar el documento
 $pdf = new PDF();
