@@ -232,10 +232,5 @@ class AlumnoCarrera {
 
 }
 
-// Ejemplo de uso
-$alumnoCarrera = new AlumnoCarrera();
-$datos = $alumnoCarrera->fetchAlumnosInscriptosAñoDni(2022,43766375);
-echo "<pre>";
-var_dump($datos);
-echo "</pre>";
+
 ?>

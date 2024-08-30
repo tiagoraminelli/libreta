@@ -1,72 +1,106 @@
 <?php
+require('fpdf.php');
+require('../modelo/bd.php'); // Ajusta la ruta a donde está realmente tu archivo 'bd.php'
+require('../modelo/alumno-materia.php'); // Ajusta la ruta a donde está realmente tu archivo 'alumno-materia.php');
+require('../modelo/alumno.php'); // 
 
-require('./fpdf.php');
-
-class LIBRETA extends FPDF
+// Clase extendida para personalizar el PDF
+class PDF extends FPDF
 {
+    private $background; // Propiedad para la imagen de fondo
 
-   // Cabecera de página
-   function Header()
-   {
-      //include '../../recursos/Recurso_conexion_bd.php';//llamamos a la conexion BD
+    // Método para configurar la imagen de fondo
+    function setBackground($img)
+    {
+        $this->background = $img;
+    }
 
+    // Encabezado del PDF
+    function Header()
+    {
+        // Agregar imagen de fondo si está configurada
+        if ($this->background) {
+            $this->Image($this->background, 0, 0, $this->GetPageWidth(), $this->GetPageHeight());
+        }
+    
+        // Configuración del encabezado con datos de la escuela
+        $this->SetFont('Times', 'I', 14); 
+        $this->SetTextColor(0, 0, 0); 
 
-   
+        // Título de la institución
+        $this->SetXY(10, 15);
+        $this->Cell(0, 10, 'Escuela Normal Superior N40 Mariano Moreno', 0, 1, 'L');
 
-      /* TITULO DE LA TABLA */
-      //color
-      $this->SetTextColor(2, 100, 0);
-      $this->Cell(10); // mover a la derecha
-      $this->SetFont('Arial', 'B', 15);
-      $this->Cell(100, 10, utf8_decode("libreta"), 0, 2, 'C', 0);
-      $this->Ln(7);
+        // Información de contacto
+        $this->SetFont('Arial', '', 12);
+        $this->SetXY(10, 23);
+        $this->Cell(0, 10, 'Direccion: J.M. Bullo 1402-C.P. 3070 ', 1, 1, 'L');
+        $this->SetXY(10, 30);
+        $this->Cell(0, 10, 'Teléfonos: 03408-422447    Correo: esc40mmoreno@yahoo.com.ar', 1, 1, 'L');
 
-      /* CAMPOS DE LA TABLA */
-      //color
-      $this->SetFillColor(228, 100, 0); //colorFondo
-      $this->SetTextColor(255, 255, 255); //colorTexto
-      $this->SetDrawColor(163, 163, 163); //colorBorde
-      $this->SetFont('Arial', 'B', 11);
-      $this->Cell(18, 10, utf8_decode('ASIGNATURA'), 0, 0, 'C', 1);
-      $this->Cell(20, 10, utf8_decode('NOTA'), 1, 0, 'C', 1);
-      $this->Cell(30, 10, utf8_decode('ESTADO'), 1, 0, 'C', 1);
-      $this->Cell(25, 10, utf8_decode('NOTA FINAL'), 1, 0, 'C', 1);
-      $this->Cell(25, 10, utf8_decode('ESTADO FINAL'), 0, 0, 'C', 1);
-   }
+        // Línea divisoria
+        $this->Ln(10);
+        $this->Cell(0, 0, '', 'T');
+        $this->Ln(5);
+    }
 
-   // Pie de página
-   function Footer()
-   {
-      $this->SetY(-15); // Posición: a 1,5 cm del final
-      $this->SetFont('Arial', 'I', 8); //tipo fuente, negrita(B-I-U-BIU), tamañoTexto
-      $this->Cell(0, 10, utf8_decode('Página ') . $this->PageNo() . '/{nb}', 0, 0, 'C'); //pie de pagina(numero de pagina)
+    // Pie de página
+    function Footer()
+    {
+        $this->SetY(-30);
+        $this->SetFont('Arial', 'I', 10);
+        $this->Cell(0, 10, 'Firma del Director: ___________________________', 0, 1, 'L');
+        $this->Cell(0, 10, 'Firma del Coordinador: _______________________', 0, 0, 'L');
+    }
 
-      $this->SetY(-15); // Posición: a 1,5 cm del final
-      $this->SetFont('Arial', 'I', 8); //tipo fuente, cursiva, tamañoTexto
-      $hoy = date('d/m/Y');
-      $this->Cell(355, 10, utf8_decode($hoy), 0, 0, 'C'); // pie de pagina(fecha de pagina)
-   }
+    // Generar tabla con datos
+    function TablaDatos($header, $data)
+    {
+        // Configuración de colores y estilos para la tabla
+        $this->SetFillColor(245, 245, 245);
+        $this->SetTextColor(0);
+        $this->SetDrawColor(128, 128, 128);
+        $this->SetLineWidth(.3);
+
+        // Encabezados de la tabla
+        $this->SetFont('Arial', 'B', 10);
+        $columnWidths = array(40, 30, 20, 30); // Ajuste los anchos de las columnas según sea necesario
+
+        foreach ($header as $index => $colName) {
+            $this->Cell($columnWidths[$index], 7, utf8_decode($colName), 1, 0, 'C', true);
+        }
+        $this->Ln();
+
+        // Datos de la tabla
+        $this->SetFillColor(240, 240, 240); 
+        $this->SetFont('Arial', '', 10);
+        $fill = false; // Alternar color de fondo
+
+        foreach ($data as $row) {
+            $this->Cell($columnWidths[0], 6, utf8_decode($row['nombre']), 'LR', 0, 'L', $fill);
+            $this->Cell($columnWidths[1], 6, utf8_decode($row['anioCursado']), 'LR', 0, 'L', $fill);
+            $this->Cell($columnWidths[2], 6, utf8_decode($row['nota']), 'LR', 0, 'L', $fill);
+            $this->Cell($columnWidths[3], 6, utf8_decode($row['estado_final']), 'LR', 0, 'L', $fill);
+            $this->Ln();
+            $fill = !$fill; // Alternar color de fondo para la siguiente fila
+        }
+
+        // Línea de cierre de tabla
+        $this->Cell(array_sum($columnWidths), 0, '', 'T');
+    }
 }
 
-//include '../../recursos/Recurso_conexion_bd.php';
-//require '../../funciones/CortarCadena.php';
-/* CONSULTA INFORMACION DEL HOSPEDAJE */
-//$consulta_info = $conexion->query(" select *from hotel ");
-//$dato_info = $consulta_info->fetch_object();
+// Datos para el encabezado de la tabla
+$header = array('Nombre', 'Año Cursado', 'Nota', 'Estado Final');
 
-$pdf = new LIBRETA();
-$pdf->AddPage(); /* aqui entran dos para parametros (horientazion,tamaño)V->portrait H->landscape tamaño (A3.A4.A5.letter.legal) */
-$pdf->AliasNbPages(); //muestra la pagina / y total de paginas
+// Instancia del modelo para obtener datos
+$alumnoCarrera = new AlumnoCarrera();
+$data = $alumnoCarrera->fetchAlumnosInscriptosAñoDni(2022, 43766375);
 
-$i = 0;
-$pdf->SetFont('Arial', '', 12);
-$pdf->SetDrawColor(163, 163, 163); //colorBorde
-
-/*$consulta_reporte_alquiler = $conexion->query("  ");*/
-
-/*while ($datos_reporte = $consulta_reporte_alquiler->fetch_object()) {      
-   }*/
-$i = $i + 1;
-
-
-$pdf->Output('Prueba.pdf', 'I');//nombreDescarga, Visor(I->visualizar - D->descargar)
+// Crear instancia del PDF y generar el documento
+$pdf = new PDF();
+$pdf->setBackground('C:\xampp\htdocs\libreta\public\FW3.jpg'); // Configurar la imagen de fondo
+$pdf->AddPage();
+$pdf->TablaDatos($header, $data);
+$pdf->Output('I', 'Libreta.pdf');
+?>
